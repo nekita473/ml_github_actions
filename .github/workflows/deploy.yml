@@ -16,8 +16,25 @@ jobs:
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
 
-      - name: Deploy via API
+      - name: Deploy to Yandex Cloud COI VM
+        uses: yc-actions/yc-coi-deploy@v2
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+          folder-id: ${{ secrets.YC_FOLDER_ID }}
+          vm-name: my-app-vm
+          image: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          # Optional: If you need to replace an existing VM
+          replace-vm-if-exists: true
+          # Optional: Add public IP if needed
+          assign-public-ip: true
+          # Optional: Specify subnet
+          # vm-subnet-id: ${{ secrets.YC_SUBNET_ID }}
+      
+      - name: Verify deployment
         run: |
-          curl -X POST https://api.cloudprovider/deploy \
-            -H "Authorization: Bearer ${{ secrets.CLOUD_TOKEN }}" \
-            -d "image=ghcr.io/${{ github.repository }}:${{ github.sha }}"
+          # Get VM IP
+          VM_IP=$(yc compute instance get my-app-vm \
+            --format json | jq -r '.network_interfaces[0].primary_v4_address.one_to_one_nat.address')
+          
+          # Test the application
+          curl -f http://$VM_IP/health || echo "Deployment verification failed"
