@@ -27,7 +27,7 @@ jobs:
           folder-id: ${{ secrets.YC_FOLDER_ID}}
           
           # 3. Прямая ссылка на образ в GHCR
-          image: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          revision-image-url: ghcr.io/${{ github.repository }}:${{ github.sha }}
           
           # 4. Учетные данные для доступа к GHCR (ВАЖНО!)
           image-pull-secret: |
