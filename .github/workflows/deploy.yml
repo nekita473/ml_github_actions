@@ -16,25 +16,24 @@ jobs:
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
 
-      - name: Deploy to Yandex Cloud COI VM
-        uses: yc-actions/yc-coi-deploy@v2
+      - name: Deploy to Yandex Cloud Serverless Container
+        uses: yc-actions/yc-sls-container-deploy@v2
         with:
+          # 1. Аутентификация через сервисный аккаунт
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
-          folder-id: ${{ secrets.YC_FOLDER_ID }}
-          vm-name: my-app-vm
-          image: ghcr.io/${{ github.repository }}:${{ github.sha }}
-          # Optional: If you need to replace an existing VM
-          replace-vm-if-exists: true
-          # Optional: Add public IP if needed
-          assign-public-ip: true
-          # Optional: Specify subnet
-          # vm-subnet-id: ${{ secrets.YC_SUBNET_ID }}
-      
-      - name: Verify deployment
-        run: |
-          # Get VM IP
-          VM_IP=$(yc compute instance get my-app-vm \
-            --format json | jq -r '.network_interfaces[0].primary_v4_address.one_to_one_nat.address')
           
-          # Test the application
-          curl -f http://$VM_IP/health || echo "Deployment verification failed"
+          # 2. ID контейнера (можно найти в консоли Yandex Cloud)
+          container-id: ${{ secrets.YC_CONTAINER_ID }}
+          
+          # 3. Прямая ссылка на образ в GHCR
+          image: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          
+          # 4. Учетные данные для доступа к GHCR (ВАЖНО!)
+          image-pull-secret: |
+            {
+              "auths": {
+                "ghcr.io": {
+                  "auth": "${{ github.token }}"  # ← Используем github.token
+                }
+              }
+            }
