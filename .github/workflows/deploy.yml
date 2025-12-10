@@ -46,6 +46,8 @@ jobs:
           # 2. ID контейнера (можно найти в консоли Yandex Cloud)
           container-name: test
           folder-id: ${{ secrets.YC_FOLDER_ID}}
+
+          revision-service-account-id: ${{ secrets.YC_CONTAINER_SA_ID}}
           
           # 3. Прямая ссылка на образ в GHCR
           revision-image-url: cr.yandex/${{ secrets.YC_REGISTRY_ID }}/ml-model:${{ github.sha }}
