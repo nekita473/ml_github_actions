@@ -42,7 +42,7 @@ def serve():
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
 
-    server.add_insecure_port('[::]:80')
+    server.add_insecure_port('[::]:443')
     server.start()
     server.wait_for_termination()
 

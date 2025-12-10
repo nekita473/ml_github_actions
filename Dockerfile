@@ -1,10 +1,10 @@
 FROM python:3.11-slim
-ENV PORT=80 \
+ENV PORT=443 \
     MODEL_PATH=/app/models/model.pkl \
     MODEL_VERSION=v1.0.0
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-EXPOSE 80
+EXPOSE 443
 CMD ["python", "-m", "server.server"]
