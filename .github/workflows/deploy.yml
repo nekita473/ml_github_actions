@@ -49,3 +49,4 @@ jobs:
           
           # 3. Прямая ссылка на образ в GHCR
           revision-image-url: cr.yandex/${{ secrets.YC_REGISTRY_ID }}/ml-model:${{ github.sha }}
+          revision-service-account-id: ${{ secrets.YC_CONTAINER_SA_ID }}
